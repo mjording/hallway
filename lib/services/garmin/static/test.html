@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+	"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>test</title>
+	<!-- Prototype -->
+    <script type="text/javascript" src="prototype.js"></script>
+    
+	<!-- API -->
+    <script type="text/javascript" src="util/Util-BrowserDetect.js"></script>
+    <script type="text/javascript" src="util/Util-Broadcaster.js"></script>
+    <script type="text/javascript" src="util/Util-PluginDetect.js"></script>
+    <script type="text/javascript" src="util/Util-XmlConverter.js"></script>
+
+    <script type="text/javascript" src="device/GarminObjectGenerator.js"></script>
+    <script type="text/javascript" src="device/GarminPluginUtils.js"></script>
+    <script type="text/javascript" src="device/GarminDevicePlugin.js"></script>
+    <script type="text/javascript" src="device/GarminDevice.js"></script>
+    <script type="text/javascript" src="device/GarminDeviceControl.js"></script>
+	
+</head>
+
+<body>
+
+<script>
+var devControl = new Garmin.DeviceControl();
+devControl.unlock( ["http://localhost:8042/",""] );
+devControl.validatePlugin(); //throws if not available
+
+var listener = Class.create();
+listener.prototype = {
+	initialize: function(){},
+	onFinishFindDevices: function(json) {
+		var devices = devControl.getDevices();
+		if(devices.length == 0) return window.alert("no devices :(");
+		window.alert("Reading fitness activities from "+devices[0].getDisplayName());
+		devControl.setDeviceNumber(devices[0].getNumber());
+		devControl.readDataFromDevice('FitnessHistory');
+	},
+	onFinishReadFromDevice: function(json) {
+		window.alert(devControl.gpsDataString);
+	}
+}
+devControl.register(new listener());
+devControl.findDevices();
+
+</script>
+</body>
+</html>
