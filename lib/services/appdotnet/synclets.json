@@ -1,0 +1,12 @@
+{
+	"name":"App.net",
+	"desc":"Connect with any appdotnet account",
+  "icons": [
+    {"height": 16, "width": 16, "source":"http://assets.singly.com/service-icons/16px/appdotnet.png"},
+    {"height": 24, "width": 24, "source":"http://assets.singly.com/service-icons/24px/appdotnet.png"},
+    {"height": 32, "width": 32, "source":"http://assets.singly.com/service-icons/32px/appdotnet.png"}
+  ],
+    "synclets":[
+        {"name": "self",    "frequency": 86400, "class":"core"}
+    ]
+}
