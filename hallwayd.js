@@ -60,9 +60,14 @@ lconfig.alerting = { key: 1 };
 
 if (lconfig.alerting && lconfig.alerting.key) {
   alerting.init(lconfig.alerting);
+  console.log('Installing alert');
   alerting.install(function(E) {
-    logger.error("Uncaught exception: %s", E.message);
-    shutdown(1);
+    if (E.domain) {
+      logger.info("Exception handled by domain:", E.message);
+    } else {
+      logger.error("Alert Uncaught exception: %s", E.message);
+      //shutdown(1);
+    }
   });
 }
 var taskman = require('taskman');
@@ -223,7 +228,12 @@ process.on("SIGTERM", function() {
 });
 
 if (!process.env.LOCKER_TEST) {
+  console.log('Adding global handler');
   process.on('uncaughtException', function(err) {
+    if (err.domain) {
+      logger.info("Exception handled by domain", err.message);
+      return;
+    }
     try {
       // copy of these in alerting.js so they don't fire alerts too
       var E = err;
@@ -246,7 +256,7 @@ if (!process.env.LOCKER_TEST) {
         return;
       }
 
-      logger.error('Uncaught exception:');
+      logger.error('Normal Uncaught exception: %s', err.message);
       logger.error(util.inspect(err));
 
       if (err && err.stack) logger.error(util.inspect(err.stack));
@@ -254,10 +264,10 @@ if (!process.env.LOCKER_TEST) {
         var airbrake = require('airbrake').createClient(lconfig.airbrakeKey);
         airbrake.notify(err, function(err, url) {
           if (url) logger.error(url);
-          shutdown(1);
+          //shutdown(1);
         });
       } else {
-        shutdown(1);
+        //shutdown(1);
       }
     } catch (e) {
       try {
@@ -267,7 +277,7 @@ if (!process.env.LOCKER_TEST) {
         // we tried...
       }
 
-      process.exit(1);
+      //process.exit(1);
     }
   });
 }
