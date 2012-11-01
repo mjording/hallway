@@ -15,6 +15,54 @@ describe('servezas', function() {
       assert(fb.length > 2);
       done();
     });
+    it('shouldn\'t return global synclets', function(done) {
+      servezas.serviceList().forEach(function(service) {
+        var synclets = servezas.syncletList(service);
+        for (var i in synclets) {
+          assert(!servezas.syncletData(service, synclets[i]).global);
+        }
+      });
+      done();
+    });
+  });
+
+  describe('globalSyncletList()', function() {
+    it('should return some synclets', function(done) {
+      var li = servezas.globalSyncletList('linkedin');
+      assert(li.length > 0);
+      done();
+    });
+    it('should only return global synclets', function(done) {
+      servezas.serviceList().forEach(function(service) {
+        var synclets = servezas.globalSyncletList(service);
+        for (var i in synclets) {
+          assert(servezas.syncletData(service, synclets[i]).global);
+        }
+      });
+      done();
+    });
+  });
+
+  describe('allSyncletList()', function() {
+    it('should return some synclets', function(done) {
+      var li = servezas.allSyncletList('linkedin');
+      assert(li.length > 0);
+      done();
+    });
+    it('should return global and regular synclets', function(done) {
+      var foundReg, foundGlobal;
+      servezas.serviceList().forEach(function(service) {
+        var synclets = servezas.allSyncletList(service);
+        for (var i in synclets) {
+          if (servezas.syncletData(service, synclets[i]).global) {
+            foundGlobal = true;
+          } else foundReg = true;
+        }
+      });
+      assert(foundGlobal);
+      assert(foundReg);
+      done();
+    });
   });
 
   describe('syncletData()', function() {
